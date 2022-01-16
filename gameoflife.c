@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define ALIVE   1
-#define DEAD    0 
+#define ALIVE           1
+#define DEAD            0 
+#define DISPLAY_TIME    1 // iteration display time in seconds
 
 typedef unsigned char byte;
 
@@ -200,11 +201,11 @@ int main(int argc, char const *argv[])
     }
     GameOfLifeData* gameData = init(w, h, grid);
     display(gameData);
-    sleep(2);
+    sleep(DISPLAY_TIME);
     for (int i = 0; i < 5; i++) {
         update(gameData);
         display(gameData);
-        sleep(2);
+        sleep(DISPLAY_TIME);
     }
     free(gameData->grid);
     free(gameData);
