@@ -3,10 +3,9 @@
 Conway game of life implementation in C.
 
 ### Requires:
- `make` 
- `gcc`
+ `make` `gcc`
 
 ### Usage:
-`make` or `make run` to run game of life
-`make gameoflife` to build `gameoflife` executable
+`make` or `make run` to run game of life<br>
+`make gameoflife` to build `gameoflife` executable<br>
 `make clean` to clean
