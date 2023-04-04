@@ -79,7 +79,7 @@ int get_alive_neighbours_count(GameOfLifeData_t *data, int i, int j) {
     count += (int)get_cell_state(i - 1, j, data); // top
     if (j < data->w - 1) {
       count += (int)get_cell_state(i - 1, j + 1, data); // top right
-  }
+    }
   }
   if (j > 0)
     count += (int)get_cell_state(i, j - 1, data); // left
@@ -93,7 +93,7 @@ int get_alive_neighbours_count(GameOfLifeData_t *data, int i, int j) {
     count += (int)get_cell_state(i + 1, j, data); // bottom
     if (j < data->w - 1) {
       count += (int)get_cell_state(i + 1, j + 1, data); // bottom right
-  }
+    }
   }
   return count;
 }
@@ -128,84 +128,49 @@ void update(GameOfLifeData_t **old) {
 }
 
 /**
- * @brief Display current game of life state to terminal, 10x10 display example
- * ('*' = alive cell) :
- *   ___________________________________________________________
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |  *  |     |     |     |     |     |     |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |  *  |     |  *  |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |  *  |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |  *  |  *  |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |  *  |     |     |  *  |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |  *  |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |     |  *  |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |     |     |     |     |     |     |     |     |     |     |
- *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+ * @brief Display current game of life state to terminal, 20x10 display example
+ * ('@' = alive cell):
+ *
+ *  --------------------
+ * |           @ @@     |
+ * |    @ @    @ @      |
+ * |    @    @ @        |
+ * |              @     |
+ * |     @   @   @    @ |
+ * |   @   @       @    |
+ * |                    |
+ * |      @   @         |
+ * | @    @     @       |
+ * | @@ @@ @            |
+ *  --------------------
  *
  * @param data current game of life state to display
  */
 void display(GameOfLifeData_t *data) {
   // clear terminal
   printf("\e[1;1H\e[2J");
-
-  // First line
-  // => ' ___________________________________________________________'
-  printf(" _____");
-  for (int j = 1; j < data->w; j++) {
-    printf("______");
+  printf(" ");
+  for (int j = 0; j < data->w; j++) {
+    printf("-");
   }
   printf("\n");
-
   for (int i = 0; i < data->h; i++) {
-    // First line of cell boxes
-    // => '|     |     |     |     |     |     |     |     |     |     |'
-    printf("|");
-    for (int j = 0; j < data->w; j++) {
-      printf("     |");
-    }
-    printf("\n");
-
-    // Middle line of cell boxes
-    // => '|  *  |     |     |  *  |     |  *  |  *  |     |     |     |'
     printf("|");
     for (int j = 0; j < data->w; j++) {
       if (get_cell_state(i, j, data) == ALIVE) {
-        printf("  *  ");
+        printf("@");
       } else {
-        printf("     ");
+        printf(" ");
       }
-      printf("|");
     }
-    printf("\n");
-
-    // Bottom line of cell boxes
-    // => '|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|'
     printf("|");
-    for (int j = 0; j < data->w; j++) {
-      printf("_____|");
-    }
     printf("\n");
   }
+  printf(" ");
+  for (int j = 0; j < data->w; j++) {
+    printf("-");
+  }
+  printf("\n");
 }
 
 int main(int argc, char **argv) {
