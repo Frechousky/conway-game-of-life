@@ -2,10 +2,18 @@
 
 Conway game of life implementation in C.
 
-### Requires:
- `make` `gcc`
+## Requires
 
-### Usage:
-`make` or `make run` to run game of life<br>
-`make gameoflife` to build `gameoflife` executable<br>
-`make clean` to clean
+* `make`
+* `gcc`
+
+## Optionnal
+
+* `valgrind`
+
+## Usage
+
+* `make` or `make gameoflife` to build `gameoflife` binary
+* `make run` to run game of life
+* `make clean` to delete `gameoflife` binary
+* `make valgrind` to check for memory leaks
