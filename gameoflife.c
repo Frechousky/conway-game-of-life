@@ -14,10 +14,10 @@ struct GameOfLifeData
     int w;      // grid height
     byte* grid; // keeps cells state (DEAD or ALIVE)
 };
-typedef struct GameOfLifeData GameOfLifeData;
+typedef struct GameOfLifeData GameOfLifeData_t;
 
-GameOfLifeData* init(int w, int h, byte* grid) {
-    GameOfLifeData* data = malloc(sizeof(GameOfLifeData));
+GameOfLifeData_t* init(int w, int h, byte* grid) {
+    GameOfLifeData_t* data = malloc(sizeof(GameOfLifeData_t));
     data->h = h;
     data->w = w;
     data->grid = grid;
@@ -58,7 +58,7 @@ void setCellState(byte grid[], int i, int j, int w, byte state) {
  * @param j column index
  * @return int 
  */
-int getAliveNeighboursCount(GameOfLifeData* data, int i, int j) {
+int getAliveNeighboursCount(GameOfLifeData_t* data, int i, int j) {
     int aliveNeighboursCount = 0;
     // top neighbours
     if (i != 0) {
@@ -90,7 +90,7 @@ int getAliveNeighboursCount(GameOfLifeData* data, int i, int j) {
  * 
  * @param toUpdate game of life data to update
  */
-void update(GameOfLifeData* toUpdate) {
+void update(GameOfLifeData_t* toUpdate) {
     byte* newGrid = malloc(toUpdate->h * toUpdate->w * sizeof(byte));
     for (int i = 0; i < toUpdate->h; i++) {
         for (int j = 0; j < toUpdate->w; j++) {
@@ -147,7 +147,7 @@ void update(GameOfLifeData* toUpdate) {
  * 
  * @param toDisplay current game of life state to display
  */
-void display(GameOfLifeData* toDisplay) {
+void display(GameOfLifeData_t* toDisplay) {
     // clear terminal
     printf("\e[1;1H\e[2J");
     
@@ -194,12 +194,7 @@ void display(GameOfLifeData* toDisplay) {
 int main(int argc, char const *argv[])
 {
     int h = 10, w = 10;
-    byte* grid = malloc(h * w * sizeof(byte));
-    // init grid with random cell states
-    for (int i = 0; i < h * w; i++) {
-        grid[i] = (byte) (rand() & ALIVE);
-    }
-    GameOfLifeData* gameData = init(w, h, grid);
+    GameOfLifeData_t* gameData = init(w, h, grid);
     display(gameData);
     sleep(DISPLAY_TIME);
     for (int i = 0; i < 5; i++) {
