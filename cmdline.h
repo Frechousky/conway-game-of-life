@@ -39,7 +39,7 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
-  int width_arg;	/**< @brief Grid with (default='10').  */
+  int width_arg;	/**< @brief Grid with (default='20').  */
   char * width_orig;	/**< @brief Grid with original value given at command line.  */
   const char *width_help; /**< @brief Grid with help description.  */
   int height_arg;	/**< @brief Grid height (default='10').  */

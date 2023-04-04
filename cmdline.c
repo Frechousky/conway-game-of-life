@@ -36,7 +36,7 @@ const char *gengetopt_args_info_description = "Run a randomly initialized Conway
 const char *gengetopt_args_info_help[] = {
   "      --help              Print help and exit",
   "  -V, --version           Print version and exit",
-  "  -w, --width=INT         Grid with  (default=`10')",
+  "  -w, --width=INT         Grid with  (default=`20')",
   "  -h, --height=INT        Grid height  (default=`10')",
   "  -d, --display_time=INT  Display time of a single iteration in seconds\n                            (default=`1')",
   "  -i, --iter=INT          Number of iteration  (default=`10')",
@@ -75,7 +75,7 @@ static
 void clear_args (struct gengetopt_args_info *args_info)
 {
   FIX_UNUSED (args_info);
-  args_info->width_arg = 10;
+  args_info->width_arg = 20;
   args_info->width_orig = NULL;
   args_info->height_arg = 10;
   args_info->height_orig = NULL;
@@ -504,7 +504,7 @@ cmdline_parser_internal (
         
           if (update_arg( (void *)&(args_info->width_arg), 
                &(args_info->width_orig), &(args_info->width_given),
-              &(local_args_info.width_given), optarg, 0, "10", ARG_INT,
+              &(local_args_info.width_given), optarg, 0, "20", ARG_INT,
               check_ambiguity, override, 0, 0,
               "width", 'w',
               additional_error))
