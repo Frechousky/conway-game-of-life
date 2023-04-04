@@ -6,6 +6,9 @@
 #define DEAD            0 
 #define DISPLAY_TIME    1 // iteration display time in seconds
 
+#define get_cell_state(i, j, data) data->grid[j + data->w * i]
+#define set_cell_state(i, j, data, v) data->grid[j + data->w * i] = v
+
 typedef unsigned char byte;
 
 struct GameOfLifeData
@@ -16,8 +19,31 @@ struct GameOfLifeData
 };
 typedef struct GameOfLifeData GameOfLifeData_t;
 
+/**
+ * @brief Generate random game of life grid (i.e. each cell has a random ALIVE or DEAD state) of size w * h
+ * 
+ * @param w grid with
+ * @param h grid height
+ * @return byte* grid (must be free'd by caller)
+ */
+byte* generate_random_grid(int w, int h) {
+    byte* grid = (byte*) malloc(h * w * sizeof(byte));
+    for (int i = 0; i < h * w; i++) {
+        grid[i] = (byte) (rand() & ALIVE);
+    }
+    return grid;
+}
+
+/**
+ * @brief Convenient method to create GameOfLifeData_t
+ * 
+ * @param w 
+ * @param h 
+ * @param grid 
+ * @return GameOfLifeData_t* data (must be free'd by caller)
+ */
 GameOfLifeData_t* init(int w, int h, byte* grid) {
-    GameOfLifeData_t* data = malloc(sizeof(GameOfLifeData_t));
+    GameOfLifeData_t* data = (GameOfLifeData_t*) malloc(sizeof(GameOfLifeData_t));
     data->h = h;
     data->w = w;
     data->grid = grid;
@@ -25,90 +51,64 @@ GameOfLifeData_t* init(int w, int h, byte* grid) {
 }
 
 /**
- * @brief Get cell state (0 = DEAD, 1 = ALIVE)
+ * @brief Convenient method to free GameOfLifeData_t
  * 
- * @param grid cells state grid
- * @param i row index of cell
- * @param j column index of cell
- * @param w grid width
- * @return byte cell state (0 = DEAD, 1 = ALIVE)
+ * @param d data to free
  */
-byte getCellState(byte grid[], int i, int j, int w) {
-    return grid[j + w * i];
+void free_data(GameOfLifeData_t *d) {
+    free(d->grid);
+    free(d);
 }
 
 /**
- * @brief Set the Cell State object
- * 
- * @param grid 
- * @param i 
- * @param j 
- * @param w 
- * @param state 
- */
-void setCellState(byte grid[], int i, int j, int w, byte state) {
-    grid[j + w * i] = state;
-}
-
-/**
- * @brief Get number of alive neighbours for point at position (i, j). Checks up to 8 neighbours.
+ * @brief Get number of alive neighbours for cell at position (i, j) in grid, checks up to 8 neighbours.
  * 
  * @param data 
  * @param i line index
  * @param j column index
  * @return int 
  */
-int getAliveNeighboursCount(GameOfLifeData_t* data, int i, int j) {
-    int aliveNeighboursCount = 0;
-    // top neighbours
+int get_alive_neighbours_count(GameOfLifeData_t* data, int i, int j) {
+    int count = 0;
     if (i != 0) {
-        // top left
-        if (j != 0) aliveNeighboursCount += (int) getCellState(data->grid, i - 1, j - 1, data->w);
-        // top
-        aliveNeighboursCount += (int) getCellState(data->grid, i - 1, j, data->w);
-        // top right
-        if (j != data->w - 1) aliveNeighboursCount += (int) getCellState(data->grid, i - 1, j + 1, data->w);
+        if (j != 0) count += (int) get_cell_state(i - 1, j - 1, data);              // top left
+        count += (int) get_cell_state( i - 1, j, data);                             // top
+        if (j != data->w - 1) count += (int) get_cell_state( i - 1, j + 1, data);   // top right
     }
-    // left
-    if (j != 0) aliveNeighboursCount += (int) getCellState(data->grid, i, j - 1, data->w);
-    // right
-    if (j != data->w - 1) aliveNeighboursCount += (int) getCellState(data->grid, i, j + 1, data->w);
-    // bottom
+    if (j != 0) count += (int) get_cell_state( i, j - 1, data);                     // left
+    if (j != data->w - 1) count += (int) get_cell_state( i, j + 1, data);           // right
     if (i != data->h - 1) {
-        // bottom left
-        if (j != 0) aliveNeighboursCount += (int) getCellState(data->grid, i + 1, j - 1, data->w);
-        // bottom
-        aliveNeighboursCount += (int) getCellState(data->grid, i + 1, j, data->w);
-        // bottom right
-        if (j != data->w - 1) aliveNeighboursCount += (int) getCellState(data->grid, i + 1, j + 1, data->w);
+        if (j != 0) count += (int) get_cell_state( i + 1, j - 1, data);             // bottom left
+        count += (int) get_cell_state( i + 1, j, data);                             // bottom
+        if (j != data->w - 1) count += (int) get_cell_state( i + 1, j + 1, data);   // bottom right
     }
-    return aliveNeighboursCount;
+    return count;
 }
 
 /**
  * @brief Update state according to game of life rules (see https://en.wikipedia.org/wiki/Conway's_Game_of_Life#Rules)
  * 
- * @param toUpdate game of life data to update
+ * @param old game of life data to update
  */
-void update(GameOfLifeData_t* toUpdate) {
-    byte* newGrid = malloc(toUpdate->h * toUpdate->w * sizeof(byte));
-    for (int i = 0; i < toUpdate->h; i++) {
-        for (int j = 0; j < toUpdate->w; j++) {
-            int aliveNeighbours = getAliveNeighboursCount(toUpdate, i, j);
-            byte currentCellState = getCellState(toUpdate->grid, i, j, toUpdate->w);
-            byte newState = DEAD;
-            if (currentCellState == ALIVE && (aliveNeighbours == 2 || aliveNeighbours == 3)) {
+void update(GameOfLifeData_t** old) {
+    GameOfLifeData_t* upd = init((*old)->w, (*old)->h, (byte*) malloc((*old)->h * (*old)->w * sizeof(byte)));
+    for (int i = 0; i < (*old)->h; i++) {
+        for (int j = 0; j < (*old)->w; j++) {
+            int nghbrs_cnt = get_alive_neighbours_count(*old, i, j);
+            byte old_state = get_cell_state(i, j, (*old));
+            byte upd_state = DEAD;
+            if (old_state == ALIVE && (nghbrs_cnt == 2 || nghbrs_cnt == 3)) {
                 // Cells alive with 2 or 3 alive neighbours stays alive
-                newState = ALIVE;
-            } else if (currentCellState == DEAD && aliveNeighbours == 3) {
+                upd_state = ALIVE;
+            } else if (old_state == DEAD && nghbrs_cnt == 3) {
                 // Dead cells with 3 alive neighbours comes back to life
-                newState = ALIVE;
+                upd_state = ALIVE;
             }
-            setCellState(newGrid, i, j, toUpdate->w, newState);
+            set_cell_state(i, j, upd, upd_state);
         }
     }
-    free(toUpdate->grid);
-    toUpdate->grid = newGrid;
+    free_data(*old);
+    *old = upd;
 }
 
 /**
@@ -145,25 +145,25 @@ void update(GameOfLifeData_t* toUpdate) {
  *  |     |     |     |     |     |     |     |     |     |     |
  *  |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
  * 
- * @param toDisplay current game of life state to display
+ * @param data current game of life state to display
  */
-void display(GameOfLifeData_t* toDisplay) {
+void display(GameOfLifeData_t* data) {
     // clear terminal
     printf("\e[1;1H\e[2J");
     
     // First line
     // => ' ___________________________________________________________'
     printf(" _____");
-    for (int j = 1; j < toDisplay->w; j++) {
+    for (int j = 1; j < data->w; j++) {
         printf("______");
     }
     printf("\n");
 
-    for (int i = 0; i < toDisplay->h; i++) {
+    for (int i = 0; i < data->h; i++) {
         // First line of cell boxes
         // => '|     |     |     |     |     |     |     |     |     |     |'
         printf("|");
-        for (int j = 0; j < toDisplay->w; j++) {
+        for (int j = 0; j < data->w; j++) {
             printf("     |");
         }
         printf("\n");
@@ -171,8 +171,8 @@ void display(GameOfLifeData_t* toDisplay) {
         // Middle line of cell boxes
         // => '|  *  |     |     |  *  |     |  *  |  *  |     |     |     |'
         printf("|");
-        for (int j = 0; j < toDisplay->w; j++) {
-            if (getCellState(toDisplay->grid, i, j, toDisplay->w) == ALIVE) {
+        for (int j = 0; j < data->w; j++) {
+            if (get_cell_state( i, j, data) == ALIVE) {
                 printf("  *  ");
             } else {
                 printf("     ");
@@ -184,7 +184,7 @@ void display(GameOfLifeData_t* toDisplay) {
         // Bottom line of cell boxes
         // => '|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|'
         printf("|");
-        for (int j = 0; j < toDisplay->w; j++) {
+        for (int j = 0; j < data->w; j++) {
             printf("_____|");
         }
         printf("\n");
@@ -194,15 +194,14 @@ void display(GameOfLifeData_t* toDisplay) {
 int main(int argc, char const *argv[])
 {
     int h = 10, w = 10;
-    GameOfLifeData_t* gameData = init(w, h, grid);
+    GameOfLifeData_t* gameData = init(w, h, generate_random_grid(w, h));
     display(gameData);
     sleep(DISPLAY_TIME);
     for (int i = 0; i < 5; i++) {
-        update(gameData);
+        update(&gameData);
         display(gameData);
         sleep(DISPLAY_TIME);
     }
-    free(gameData->grid);
-    free(gameData);
+    free_data(gameData);
     return 0;
 }
