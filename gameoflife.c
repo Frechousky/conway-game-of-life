@@ -8,8 +8,8 @@
 #define DEAD 0
 #define DISPLAY_TIME 1 // iteration display time in seconds
 
-#define get_cell_state(i, j, data) data->grid[j + data->w * i]
-#define set_cell_state(i, j, data, v) data->grid[j + data->w * i] = v
+#define get_cell_state(i, j, data) data->grid[j + data->w * (i)]
+#define set_cell_state(i, j, data, v) data->grid[j + data->w * (i)] = v
 
 typedef unsigned char byte;
 
