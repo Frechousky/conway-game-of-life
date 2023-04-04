@@ -12,8 +12,8 @@
 typedef unsigned char byte;
 
 struct GameOfLifeData {
-  int h;      // grid width
-  int w;      // grid height
+  int h;      // grid height
+  int w;      // grid width
   byte *grid; // keeps cells state (DEAD or ALIVE)
 };
 typedef struct GameOfLifeData GameOfLifeData_t;
