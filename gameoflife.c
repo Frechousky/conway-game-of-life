@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "cmdline.h"
+
 #define ALIVE 1
 #define DEAD 0
 #define DISPLAY_TIME 1 // iteration display time in seconds
@@ -202,16 +204,19 @@ void display(GameOfLifeData_t *data) {
   }
 }
 
-int main(int argc, char const *argv[]) {
-  int h = 10, w = 10;
-  GameOfLifeData_t *gameData = init(w, h, generate_random_grid(w, h));
-  display(gameData);
-  sleep(DISPLAY_TIME);
-  for (int i = 0; i < 5; i++) {
-    update(&gameData);
-    display(gameData);
-    sleep(DISPLAY_TIME);
+int main(int argc, char **argv) {
+  struct gengetopt_args_info args;
+  cmdline_parser(argc, argv, &args);
+  GameOfLifeData_t *data =
+      init(args.width_arg, args.height_arg,
+           generate_random_grid(args.width_arg, args.height_arg));
+  for (int i = 0; i < args.iter_arg; i++) {
+    display(data);
+    sleep(args.display_time_arg);
+    if (i < args.iter_arg - 1) {
+      update(&data);
+    }
   }
-  free_data(gameData);
+  free_data(data);
   return 0;
 }

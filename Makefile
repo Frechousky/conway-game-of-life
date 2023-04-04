@@ -1,14 +1,17 @@
-SOURCES=gameoflife.c
+SOURCES=gameoflife.c cmdline.c cmdline.h
 BIN=gameoflife
 
 $(BIN): $(SOURCES)
-	gcc $< -o $(BIN)
+	gcc $^ -o $(BIN)
 
 run: $(BIN)
 	./gameoflife
 
+clean:
+	rm -f $(BIN)
+
 valgrind: $(BIN)
 	valgrind ./$(BIN) --leak-check=full
 
-clean:
-	rm -f $(BIN)
+gengetopt: gengetopt.conf
+	gengetopt < $<
