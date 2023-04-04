@@ -2,7 +2,7 @@ SOURCES=gameoflife.c cmdline.c cmdline.h
 BIN=gameoflife
 
 $(BIN): $(SOURCES)
-	gcc $^ -o $(BIN)
+	gcc -o $(BIN) $^
 
 run: $(BIN)
 	./gameoflife

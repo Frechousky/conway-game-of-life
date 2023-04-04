@@ -14,17 +14,16 @@
 typedef unsigned char byte;
 
 struct GameOfLifeData {
-  int h;      // grid height
   int w;      // grid width
+  int h;      // grid height
   byte *grid; // keeps cells state (DEAD or ALIVE)
 };
 typedef struct GameOfLifeData GameOfLifeData_t;
 
 /**
- * @brief Generate random game of life grid (i.e. each cell has a random ALIVE
- * or DEAD state) of size w * h
- *
- * @param w grid with
+ * @brief Generate random game of life grid of size w * h
+ * (i.e. each cell has a random ALIVE or DEAD state)
+ * @param w grid width
  * @param h grid height
  * @return byte* grid (must be free'd by caller)
  */
@@ -39,9 +38,9 @@ byte *generate_random_grid(int w, int h) {
 /**
  * @brief Convenient method to create GameOfLifeData_t
  *
- * @param w
- * @param h
- * @param grid
+ * @param w grid width
+ * @param h grid height
+ * @param grid grid containing cells state
  * @return GameOfLifeData_t* data (must be free'd by caller)
  */
 GameOfLifeData_t *init(int w, int h, byte *grid) {
@@ -73,23 +72,28 @@ void free_data(GameOfLifeData_t *d) {
  */
 int get_alive_neighbours_count(GameOfLifeData_t *data, int i, int j) {
   int count = 0;
-  if (i != 0) {
-    if (j != 0)
+  if (i > 0) {
+    if (j > 0) {
       count += (int)get_cell_state(i - 1, j - 1, data); // top left
-    count += (int)get_cell_state(i - 1, j, data);       // top
-    if (j != data->w - 1)
+    }
+    count += (int)get_cell_state(i - 1, j, data); // top
+    if (j < data->w - 1) {
       count += (int)get_cell_state(i - 1, j + 1, data); // top right
   }
-  if (j != 0)
+  }
+  if (j > 0)
     count += (int)get_cell_state(i, j - 1, data); // left
-  if (j != data->w - 1)
+  if (j < data->w - 1) {
     count += (int)get_cell_state(i, j + 1, data); // right
-  if (i != data->h - 1) {
-    if (j != 0)
+  }
+  if (i < data->h - 1) {
+    if (j > 0) {
       count += (int)get_cell_state(i + 1, j - 1, data); // bottom left
-    count += (int)get_cell_state(i + 1, j, data);       // bottom
-    if (j != data->w - 1)
+    }
+    count += (int)get_cell_state(i + 1, j, data); // bottom
+    if (j < data->w - 1) {
       count += (int)get_cell_state(i + 1, j + 1, data); // bottom right
+  }
   }
   return count;
 }
