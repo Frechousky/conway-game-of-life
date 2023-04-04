@@ -1,8 +1,14 @@
-run: gameoflife
+SOURCES=gameoflife.c
+BIN=gameoflife
+
+$(BIN): $(SOURCES)
+	gcc $< -o $(BIN)
+
+run: $(BIN)
 	./gameoflife
 
-gameoflife: gameoflife.c
-	gcc gameoflife.c -o gameoflife
+valgrind: $(BIN)
+	valgrind ./$(BIN) --leak-check=full
 
 clean:
-	rm -f gameoflife
+	rm -f $(BIN)
