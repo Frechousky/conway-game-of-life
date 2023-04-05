@@ -51,6 +51,9 @@ struct gengetopt_args_info
   int iter_arg;	/**< @brief Number of iteration (default='10').  */
   char * iter_orig;	/**< @brief Number of iteration original value given at command line.  */
   const char *iter_help; /**< @brief Number of iteration help description.  */
+  char * file_arg;	/**< @brief Fullpath to file with initial Game of Life state (width and height options are ignored when this is on).  */
+  char * file_orig;	/**< @brief Fullpath to file with initial Game of Life state (width and height options are ignored when this is on) original value given at command line.  */
+  const char *file_help; /**< @brief Fullpath to file with initial Game of Life state (width and height options are ignored when this is on) help description.  */
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
@@ -58,6 +61,7 @@ struct gengetopt_args_info
   unsigned int height_given ;	/**< @brief Whether height was given.  */
   unsigned int display_time_given ;	/**< @brief Whether display_time was given.  */
   unsigned int iter_given ;	/**< @brief Whether iter was given.  */
+  unsigned int file_given ;	/**< @brief Whether file was given.  */
 
 } ;
 

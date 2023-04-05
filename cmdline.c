@@ -40,10 +40,12 @@ const char *gengetopt_args_info_help[] = {
   "  -h, --height=INT        Grid height  (default=`10')",
   "  -d, --display_time=INT  Display time of a single iteration in seconds\n                            (default=`1')",
   "  -i, --iter=INT          Number of iteration  (default=`10')",
+  "  -f, --file=filename     Fullpath to file with initial Game of Life state\n                            (width and height options are ignored when this is\n                            on)",
     0
 };
 
 typedef enum {ARG_NO
+  , ARG_STRING
   , ARG_INT
 } cmdline_parser_arg_type;
 
@@ -69,6 +71,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->height_given = 0 ;
   args_info->display_time_given = 0 ;
   args_info->iter_given = 0 ;
+  args_info->file_given = 0 ;
 }
 
 static
@@ -83,6 +86,8 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->display_time_orig = NULL;
   args_info->iter_arg = 10;
   args_info->iter_orig = NULL;
+  args_info->file_arg = NULL;
+  args_info->file_orig = NULL;
   
 }
 
@@ -97,6 +102,7 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->height_help = gengetopt_args_info_help[3] ;
   args_info->display_time_help = gengetopt_args_info_help[4] ;
   args_info->iter_help = gengetopt_args_info_help[5] ;
+  args_info->file_help = gengetopt_args_info_help[6] ;
   
 }
 
@@ -190,6 +196,8 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   free_string_field (&(args_info->height_orig));
   free_string_field (&(args_info->display_time_orig));
   free_string_field (&(args_info->iter_orig));
+  free_string_field (&(args_info->file_arg));
+  free_string_field (&(args_info->file_orig));
   
   
 
@@ -232,6 +240,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "display_time", args_info->display_time_orig, 0);
   if (args_info->iter_given)
     write_into_file(outfile, "iter", args_info->iter_orig, 0);
+  if (args_info->file_given)
+    write_into_file(outfile, "file", args_info->file_orig, 0);
   
 
   i = EXIT_SUCCESS;
@@ -367,6 +377,7 @@ int update_arg(void *field, char **orig_field,
   char *stop_char = 0;
   const char *val = value;
   int found;
+  char **string_field;
   FIX_UNUSED (field);
 
   stop_char = 0;
@@ -399,6 +410,14 @@ int update_arg(void *field, char **orig_field,
   switch(arg_type) {
   case ARG_INT:
     if (val) *((int *)field) = strtol (val, &stop_char, 0);
+    break;
+  case ARG_STRING:
+    if (val) {
+      string_field = (char **)field;
+      if (!no_free && *string_field)
+        free (*string_field); /* free previous string */
+      *string_field = gengetopt_strdup (val);
+    }
     break;
   default:
     break;
@@ -485,10 +504,11 @@ cmdline_parser_internal (
         { "height",	1, NULL, 'h' },
         { "display_time",	1, NULL, 'd' },
         { "iter",	1, NULL, 'i' },
+        { "file",	1, NULL, 'f' },
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "Vw:h:d:i:", long_options, &option_index);
+      c = getopt_long (argc, argv, "Vw:h:d:i:f:", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -543,6 +563,18 @@ cmdline_parser_internal (
               &(local_args_info.iter_given), optarg, 0, "10", ARG_INT,
               check_ambiguity, override, 0, 0,
               "iter", 'i',
+              additional_error))
+            goto failure;
+        
+          break;
+        case 'f':	/* Fullpath to file with initial Game of Life state (width and height options are ignored when this is on).  */
+        
+        
+          if (update_arg( (void *)&(args_info->file_arg), 
+               &(args_info->file_orig), &(args_info->file_given),
+              &(local_args_info.file_given), optarg, 0, 0, ARG_STRING,
+              check_ambiguity, override, 0, 0,
+              "file", 'f',
               additional_error))
             goto failure;
         
