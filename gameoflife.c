@@ -7,8 +7,6 @@
 
 #define ALIVE 1
 #define DEAD 0
-#define DISPLAY_TIME 1 // iteration display time in seconds
-
 #define MAX_LINE_LENGTH 1024
 
 #define get_cell_state(i, j, data) data->grid[j + data->w * (i)]
