@@ -15,6 +15,7 @@
 ## Usage
 
 * `make` or `make gameoflife` to build `gameoflife` binary
+* `make debug` to build `gameoflife` binary for debugging
 * `make run` or `./gameoflife` to run game of life
 * `./gameoflife --help` FMI about CLI options
 * `make clean` to delete `gameoflife` binary
